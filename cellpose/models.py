@@ -673,11 +673,13 @@ class CellposeModel(UnetModel):
         
     def loss_fn(self, lbl, y):
         """ loss function between true labels lbl and prediction y """
+        mask = torch.from_numpy(lbl[:,:1] != -1)
         veci = 5. * self._to_device(lbl[:,1:])
         lbl  = self._to_device(lbl[:,0]>.5)
-        loss = self.criterion(y[:,:2] , veci) 
+        veci_mask = mask.repeat(1, 2, 1, 1)
+        loss = self.criterion(y[:,:2][veci_mask] , veci[veci_mask])
         loss /= 2.
-        loss2 = self.criterion2(y[:,2] , lbl)
+        loss2 = self.criterion2(y[:,2][mask[:,0]] , lbl[mask[:,0]])
         loss = loss + loss2
         return loss        
 

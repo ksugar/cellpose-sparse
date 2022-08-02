@@ -869,9 +869,12 @@ class UnetModel():
                 inds = rperm[ibatch:ibatch+batch_size]
                 rsc = diam_train[inds] / self.diam_mean if rescale else np.ones(len(inds), np.float32)
                 # now passing in the full train array, need the labels for distance field
-                imgi, lbl, scale = transforms.random_rotate_and_resize(
-                                        [train_data[i] for i in inds], Y=[train_labels[i][1:] for i in inds],
-                                        rescale=rsc, scale_range=scale_range, unet=self.unet)
+                while True:
+                    imgi, lbl, scale = transforms.random_rotate_and_resize(
+                                            [train_data[i] for i in inds], Y=[train_labels[i][1:] for i in inds],
+                                            rescale=rsc, scale_range=scale_range, unet=self.unet)
+                    if 0 < (lbl[:, 0] != -1).sum():
+                        break
                 if self.unet and lbl.shape[1]>1 and rescale:
                     lbl[:,1] *= scale[:,np.newaxis,np.newaxis]**2#diam_batch[:,np.newaxis,np.newaxis]**2
                 train_loss = self._train_step(imgi, lbl)

@@ -308,6 +308,15 @@ def labels_to_flows(labels, files=None, use_gpu=False, device=None, redo_flows=F
     if labels[0].shape[0] == 1 or labels[0].ndim < 3 or redo_flows: # flows need to be recomputed
         
         dynamics_logger.info('computing flows for labels')
+
+        # keep mask indices (negative values) and make them zeros
+        labels_mask = []
+        for label in labels:
+            mask = label < 0
+            label[mask] = 0
+            while 2 < mask.ndim:
+                mask = mask[0]
+            labels_mask.append(mask)
         
         # compute flows; labels are fixed here to be unique, so they need to be passed back
         # make sure labels are unique!
@@ -317,6 +326,11 @@ def labels_to_flows(labels, files=None, use_gpu=False, device=None, redo_flows=F
         # concatenate labels, distance transform, vector flows, heat (boundary and mask are computed in augmentations)
         flows = [np.concatenate((labels[n], labels[n]>0.5, veci[n]), axis=0).astype(np.float32)
                     for n in range(nimg)]
+        
+        # assign -1 to masked indices
+        for flow, mask in zip(flows, labels_mask):
+            flow[1, mask] = -1
+        
         if files is not None:
             for flow, file in zip(flows, files):
                 file_name = os.path.splitext(file)[0]
