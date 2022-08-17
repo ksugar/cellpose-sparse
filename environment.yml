@@ -16,6 +16,6 @@ dependencies:
     - tqdm
     - tifffile
     - fastremap
-    - cellpose
+    - ./
     
   
