@@ -44,14 +44,14 @@ with open("README.md", "r") as fh:
     
     
 setup(
-    name="cellpose",
+    name="cellpose-sparse",
     license="BSD",
-    author="Marius Pachitariu and Carsen Stringer",
-    author_email="stringerc@janelia.hhmi.org",
+    author="Marius Pachitariu, Carsen Stringer and Ko Sugawara",
+    author_email="ko.sugawara@riken.jp",
     description="anatomical segmentation algorithm",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/MouseLand/cellpose",
+    url="https://github.com/ksugar/cellpose-sparse",
     setup_requires=[
       'pytest-runner',
       'setuptools_scm',
